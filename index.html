@@ -51,4 +51,153 @@
         margin-top: 10px;
     }
     #countdown {
-        fo
+        font-size: 3em;
+        font-weight: bold;
+        margin-top: 10px;
+        text-shadow: 3px 3px #ff4b6b;
+    }
+</style>
+</head>
+<body>
+
+<h1>📸 4-Photo Strip Photobooth 🎀</h1>
+
+<label for="frameSelect">Choose a frame:</label>
+<select id="frameSelect">
+    <option value="none">None</option>
+    <option value="pink">Pink Frame</option>
+    <option value="stars">Star Frame</option>
+    <option value="hearts">Hearts Frame</option>
+</select>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none;"></canvas>
+<div id="countdown"></div>
+
+<div>
+    <button id="startBtn">Start 📷</button>
+    <button id="retakeBtn" style="display:none;">Retake 🔄</button>
+    <button id="downloadBtn" style="display:none;">Download Strip 💾</button>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const countdownEl = document.getElementById('countdown');
+const startBtn = document.getElementById('startBtn');
+const retakeBtn = document.getElementById('retakeBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const frameSelect = document.getElementById('frameSelect');
+
+const context = canvas.getContext('2d');
+let photos = []; // store the 4 photos
+let currentPhoto = 0;
+
+const frames = {
+    pink: 'https://i.imgur.com/2yafKbl.png',
+    stars: 'https://i.imgur.com/IHdD3bL.png',
+    hearts: 'https://i.imgur.com/l1UBACJ.png'
+};
+
+// Get camera access
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => { video.srcObject = stream; })
+    .catch(err => { alert("Camera access denied!"); console.error(err); });
+
+function startCountdown() {
+    let count = 3;
+    countdownEl.textContent = count;
+    startBtn.disabled = true;
+    const timer = setInterval(() => {
+        count--;
+        countdownEl.textContent = count > 0 ? count : "";
+        if (count === 0) {
+            clearInterval(timer);
+            takePhoto();
+        }
+    }, 1000);
+}
+
+function takePhoto() {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = video.videoWidth;
+    tempCanvas.height = video.videoHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    let selectedFrame = frameSelect.value;
+    if (selectedFrame !== 'none') {
+        let frameImg = new Image();
+        frameImg.src = frames[selectedFrame];
+        frameImg.onload = () => {
+            tempCtx.drawImage(frameImg, 0, 0, tempCanvas.width, tempCanvas.height);
+            savePhoto(tempCanvas);
+        }
+    } else {
+        savePhoto(tempCanvas);
+    }
+}
+
+function savePhoto(photoCanvas) {
+    photos[currentPhoto] = photoCanvas.toDataURL();
+    currentPhoto++;
+
+    if (currentPhoto < 4) {
+        alert(`Photo ${currentPhoto} taken! Click Start for next photo.`);
+        startBtn.disabled = false;
+    } else {
+        showFinalStrip();
+    }
+}
+
+function showFinalStrip() {
+    // Create vertical strip
+    canvas.width = 400; // final width
+    canvas.height = 400 * 4; // 4 photos stacked
+    context.fillStyle = "#fff";
+    context.fillRect(0,0,canvas.width,canvas.height);
+
+    for (let i=0; i<photos.length; i++){
+        let img = new Image();
+        img.src = photos[i];
+        img.onload = () => {
+            context.drawImage(img, 0, i*400, 400, 400);
+        }
+    }
+
+    video.style.display = "none";
+    canvas.style.display = "block";
+    startBtn.style.display = "none";
+    retakeBtn.style.display = "inline-block";
+    downloadBtn.style.display = "inline-block";
+    countdownEl.textContent = "";
+}
+
+function retakePhoto() {
+    if (currentPhoto > 0) {
+        currentPhoto--;
+        photos.pop();
+        canvas.style.display = "none";
+        video.style.display = "block";
+        startBtn.style.display = "inline-block";
+        retakeBtn.style.display = "none";
+        downloadBtn.style.display = "none";
+    }
+}
+
+function downloadPhoto() {
+    const link = document.createElement('a');
+    link.download = 'photobooth-strip.png';
+    link.href = canvas.toDataURL();
+    link.click();
+}
+
+startBtn.addEventListener('click', startCountdown);
+retakeBtn.addEventListener('click', retakePhoto);
+downloadBtn.addEventListener('click', downloadPhoto);
+
+</script>
+
+</body>
+</html>
+
