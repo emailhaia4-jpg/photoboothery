@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎀 Cute Photobooth with Frames 🎀</title>
+<title>🎀 4-Photo Strip Photobooth 🎀</title>
 <style>
     body {
         font-family: 'Comic Sans MS', cursive, sans-serif;
@@ -14,16 +14,16 @@
         padding: 0;
     }
     h1 {
-        font-size: 2.2em;
+        font-size: 2em;
         margin-top: 20px;
         text-shadow: 2px 2px #ff7b9c;
     }
     video, canvas {
-        border-radius: 20px;
+        border-radius: 15px;
         border: 5px solid white;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         width: 90%;
-        max-width: 500px;
+        max-width: 400px;
         margin: 10px 0;
     }
     button {
@@ -51,115 +51,4 @@
         margin-top: 10px;
     }
     #countdown {
-        font-size: 3em;
-        font-weight: bold;
-        margin-top: 10px;
-        text-shadow: 3px 3px #ff4b6b;
-    }
-</style>
-</head>
-<body>
-
-<h1>📸 Cute Party Photobooth 🎀</h1>
-
-<label for="frameSelect">Choose a frame:</label>
-<select id="frameSelect">
-    <option value="none">None</option>
-    <option value="pink">🎀 Pink Ribbon Frame</option>
-    <option value="stars">✨ Star Frame</option>
-    <option value="hearts">💖 Hearts Frame</option>
-</select>
-
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas" style="display:none;"></canvas>
-<div id="countdown"></div>
-
-<div>
-    <button id="startBtn">Start 📷</button>
-    <button id="retakeBtn" style="display:none;">Retake 🔄</button>
-    <button id="downloadBtn" style="display:none;">Download 💾</button>
-</div>
-
-<script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const countdownEl = document.getElementById('countdown');
-const startBtn = document.getElementById('startBtn');
-const retakeBtn = document.getElementById('retakeBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const frameSelect = document.getElementById('frameSelect');
-
-const context = canvas.getContext('2d');
-
-const frames = {
-    pink: 'https://i.imgur.com/2yafKbl.png', // 🎀 Pink frame
-    stars: 'https://i.imgur.com/IHdD3bL.png', // ✨ Star frame
-    hearts: 'https://i.imgur.com/l1UBACJ.png' // 💖 Hearts frame
-};
-
-// Ask for camera
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-        video.srcObject = stream;
-    })
-    .catch(err => {
-        alert("Camera access denied! Please allow it.");
-        console.error(err);
-    });
-
-function startCountdown() {
-    let count = 3;
-    countdownEl.textContent = count;
-    const timer = setInterval(() => {
-        count--;
-        countdownEl.textContent = count > 0 ? count : "";
-        if (count === 0) {
-            clearInterval(timer);
-            takePhoto();
-        }
-    }, 1000);
-}
-
-function takePhoto() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    let selectedFrame = frameSelect.value;
-    if (selectedFrame !== 'none') {
-        let frameImg = new Image();
-        frameImg.src = frames[selectedFrame];
-        frameImg.onload = () => {
-            context.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
-        }
-    }
-
-    video.style.display = "none";
-    canvas.style.display = "block";
-    startBtn.style.display = "none";
-    retakeBtn.style.display = "inline-block";
-    downloadBtn.style.display = "inline-block";
-}
-
-function retakePhoto() {
-    video.style.display = "block";
-    canvas.style.display = "none";
-    startBtn.style.display = "inline-block";
-    retakeBtn.style.display = "none";
-    downloadBtn.style.display = "none";
-}
-
-function downloadPhoto() {
-    const link = document.createElement('a');
-    link.download = 'photobooth.png';
-    link.href = canvas.toDataURL();
-    link.click();
-}
-
-startBtn.addEventListener('click', startCountdown);
-retakeBtn.addEventListener('click', retakePhoto);
-downloadBtn.addEventListener('click', downloadPhoto);
-</script>
-
-</body>
-</html>
+        fo
